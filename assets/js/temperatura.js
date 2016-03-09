@@ -1,5 +1,6 @@
 (function(exports) {
   "use strict";
+
   function Temperatura(valor,tipo)
   {
     Medida.call(this, valor, tipo);
@@ -8,9 +9,7 @@
 
   Temperatura.prototype = new Medida();
   Temperatura.prototype.constructor = Temperatura;
-/*https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/Function/call*/
 
-/*Las conversiones de temperatura se han sacado de: https://es.wikipedia.org/wiki/Temperatura*/
   function Celsius(valor)
   {
     Temperatura.call(this,valor,"c");
@@ -53,4 +52,9 @@
 
   Kelvin.prototype = new Temperatura();
   Kelvin.prototype.constructor = Kelvin;
+
+  exports.Temperatura = Temperatura;
+  exports.Celsius = Celsius;
+  exports.Farenheit = Fahrenheit;
+  exports.Kelvin = Kelvin;
 })(this);
