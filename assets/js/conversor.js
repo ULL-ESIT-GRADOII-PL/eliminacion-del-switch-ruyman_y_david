@@ -3,8 +3,17 @@
 
   function Medida(valor,tipo)
   {
-   this.tipo = tipo;
-   this.valor = valor;
+   if(!tipo) {
+     exp = XRegExp('(?<number>      ((-|\\+)?(\\d+)(\.(\\d+))?)(e((-|\\+)?(\\d+)(\\.(\\d+))?)))?\\s*$   # numero       \n'
+                 + '(?<temperature1>    [fkcpmFKCPM])\\s*                                                   # tipo'),
+     aux = XRegExp.exec(valor, exp);
+     this.valor = aux.number;
+     this.tipo = aux.temperature1;
+   }
+   else {
+     this.valor = valor;
+     this.tipo = tipo;
+   }
   }
 
   function Longitud(valor, tipo)
@@ -96,7 +105,7 @@
   exports.Kelvin = Kelvin;
   exports.Metros = Metros;
   exports.Pulgadas = Pulgadas;
-  
+
   exports.convertir = function() {
     var valor     = document.getElementById('convert').value,
         elemento  = document.getElementById('converted');
@@ -117,7 +126,7 @@
                             '(?:p(?:u(?:l(?:g(?:a(?:d(?:a(?:s)?)?)?)?)?)?)?)                # pulgadas        \n' +
                           ')))?\\s*$', 'xi');
     var valor = XRegExp.exec(valor, regexp);
-    
+
     if (valor) {
       var numero = parseFloat(valor.number),
           tipo  = valor.type[0].toLowerCase(),
