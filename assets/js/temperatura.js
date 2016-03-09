@@ -55,6 +55,6 @@
 
   exports.Temperatura = Temperatura;
   exports.Celsius = Celsius;
-  exports.Farenheit = Fahrenheit;
+  exports.Fahrenheit = Fahrenheit;
   exports.Kelvin = Kelvin;
 })(this);
