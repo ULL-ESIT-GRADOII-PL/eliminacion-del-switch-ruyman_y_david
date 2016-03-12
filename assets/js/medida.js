@@ -2,99 +2,92 @@
   "use strict";
 
   function Medida (valor, tipo) {
-    this.tipo = tipo;
-    this.valor = valor;
+    if (valor && tipo)
+    {
+      this.tipo = tipo;
+      this.valor = valor;
+    } else if (valor) {
+      this.valor = valor
+    }
   }
 
-  Medida.prototype.REGEXP = XRegExp('^\\s*(?<number> [-+]?\\d+(?:.\\d*)?)                            # NUMERO           \n' +
-                                    '\\s*(?:e(?<exp> [-+]?\\d+))?                                   # EXPONENTE         \n' +
-                                    '\\s*(?<type> (                                                 # INICIO DEL TIPO   \n' +
-                                    '(?:f(?:a(?:h(?:r(?:e(?:n(?:h(?:e(?:i(?:t)?)?)?)?)?)?)?)?)?)|     # fahrenheit      \n' +
-                                      '(?:c(?:e(?:l(?:s(?:i(?:u(?:s)?)?)?)?)?)?)|                     # celsius         \n' +
-                                      '(?:k(?:e(?:l(?:v(?:i(?:n)?)?)?)?)?)|                           # kelvin          \n' +
-                                      '(?:m(?:e(?:t(?:r(?:o(?:s)?)?)?)?)?)|                           # metros          \n' +
-                                      '(?:p(?:u(?:l(?:g(?:a(?:d(?:a(?:s)?)?)?)?)?)?)?)                # pulgadas        \n' +
-                                    '))                                                             # FIN DEL TIPO      \n' +
-                                    '((?:\\s+to)?\\s+(?<to> (                                       # TO                \n' +
-                                      '(?:f(?:a(?:h(?:r(?:e(?:n(?:h(?:e(?:i(?:t)?)?)?)?)?)?)?)?)?)|   # fahrenheit      \n' +
-                                      '(?:c(?:e(?:l(?:s(?:i(?:u(?:s)?)?)?)?)?)?)|                     # celsius         \n' +
-                                      '(?:k(?:e(?:l(?:v(?:i(?:n)?)?)?)?)?)|                           # kelvin          \n' +
-                                      '(?:m(?:e(?:t(?:r(?:o(?:s)?)?)?)?)?)|                           # metros          \n' +
-                                      '(?:p(?:u(?:l(?:g(?:a(?:d(?:a(?:s)?)?)?)?)?)?)?)                # pulgadas        \n' +
-                                    ')))?\\s*$', 'xi');
+  Medida.REGEXP = XRegExp('^\\s*(?<numero> [-+]?\\d+(?:.\\d*)?)   # NUMERO      \n' +
+                          '\\s*(?:e(?<exponente> [-+]?\\d+))?     # EXPONENTE   \n' +
+                          '\\s*(?<tipo> ([A-Z]+))                 # TIPO        \n' +
+                          '((?:\\s+to)?\\s+(?<destino> ([A-Z]+))  # TO          \n' +
+                          ')?\\s*$', 'xi');
 
-  Medida.convertir = function(value) {
-    var valor = XRegExp.exec(value, Medida.prototype.REGEXP);
+  Medida.measures = new Object();
 
-    if (valor) {
-      var numero = parseFloat(valor.number),
-          tipo  = valor.type[0].toLowerCase(),
-          to = valor.to;
+  Medida.prototype.toString = function () {
+    return this.valor.toFixed(2) + ' ' + this.constructor.name;
+  }
 
-      to && (to = to[0].toLowerCase());
+  Medida.prototype.esPrefijo = function (prefijo) {
+    if (prefijo && prefijo.match (this.MATCH)) {
+      return true;
+    }
+    return false;
+  }
 
-      // Calculamos exponente si lo hay
-      if (valor.exp) {
-        var exp = parseInt(valor.exp);
-        numero = numero * Math.pow(10, exp);
+  Medida.convertir = function(valor) {
+    var measures = Medida.measures;
+
+    var match = XRegExp.exec (valor, Medida.REGEXP);
+    if (match) {
+      var numero = parseFloat (match.numero),
+          exponente = match.exponente,
+          tipo   = match.tipo,
+          destino = match.destino;
+
+      // Calculamos el exponente
+      if (exponente) {
+        numero = numero * Math.pow (10, parseInt (exponente));
       }
 
-      console.log("Valor: " + numero + ", Tipo: " + tipo);
+      // Si no se ha introducido destino, le indicamos el mismo que el tipo
+      if (!destino) {
+        destino = tipo;
+      }
 
-      switch (tipo) {
-        case 'c':
-          var celsius = new Celsius(numero);
-          if (!to || to == 'f') {
-            return celsius.convFahrenheit().toFixed(2) + " Farenheit";
-          } else if (to == 'k') {
-            return celsius.convKelvin().toFixed(2) + " Kelvin";
+      // Buscamos el tipo
+      var ok = false;
+      var i = 0;
+      var keys = Object.keys(measures);
+      while (i < keys.length && !ok) {
+        if (measures[keys[i]].prototype.esPrefijo (tipo)) {
+          ok = true;
+          tipo = measures[keys[i]].name
+        }
+        i++;
+      }
+      // Buscamos el destino
+      ok = false;
+      i = 0;
+      while (i < keys.length && !ok && destino) {
+        if (measures[keys[i]].prototype.esPrefijo (destino)) {
+          ok = true;
+          destino = measures[keys[i]].name
+        }
+        i++;
+      }
+
+      try {
+          if (tipo != destino) {
+            var source = new measures[tipo](numero);  // new Fahrenheit(32)
+            var target = "to" + measures[destino].name; // "toCelsius"
+            return source[target]();
           } else {
-            return "Error! Conversión no permitida";
+            source = new measures[tipo](numero)
+            return source;
           }
-          break;
-        case 'f':
-          var fahrenheit = new Fahrenheit(numero);
-          if (!to || to == 'c') {
-            return fahrenheit.convCelsius().toFixed(2) + " Celsius";
-          } else if (to == 'k') {
-            return fahrenheit.convKelvin().toFixed(2) + " Kelvin";
-          } else {
-            return "Error! Conversión no permitida";
-          }
-          break;
-        case 'k':
-          var kelvin = new Kelvin(numero);
-          if (!to || to == 'c') {
-            return kelvin.convCelsius().toFixed(2) + " Celsius";
-          } else if (to == 'f') {
-            return kelvin.convFahrenheit().toFixed(2) + " Farenheit";
-          } else {
-            return "Error! Conversión no permitida";
-          }
-          break;
-        case 'm':
-          var metro = new Metros(numero);
-          if (!to || to == 'p') {
-            return metro.convPulgadas().toFixed(2) + " Pulgadas";
-          } else {
-            return "Error! Conversión no permitida";
-          }
-          break;
-        case 'p':
-          var pulgada = new Pulgadas(numero);
-          if (!to || to == 'm') {
-            return pulgada.convMetros().toFixed(2) + " Metros";
-          } else {
-            return "Error! Conversión no permitida";
-          }
-          break;
-        default:
-          /* rellene este código */
-          return "Error! El uso corecto es por ejemplo: -3.7C.";
+      }
+      catch(err) {
+        return 'Desconozco como convertir desde "' + tipo + '" hasta "' + destino + '"';
       }
     }
     else
-      return "Error! El uso corecto es por ejemplo: -3.7C.";
-  }
+      return "Introduzca una temperatura valida: 330e-1 Fahrenheit to Celsius";
+  };
   exports.Medida = Medida;
 })(this);
