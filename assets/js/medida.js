@@ -50,28 +50,24 @@
         destino = tipo;
       }
 
-      // Buscamos el tipo
-      var ok = false;
+      // Buscamos el tipo y el destino
+      var okTipo = false;
+      var okDestino = false;
       var i = 0;
       var keys = Object.keys(measures);
-      while (i < keys.length && !ok) {
-        if (measures[keys[i]].prototype.esPrefijo (tipo)) {
-          ok = true;
+      while (i < keys.length && (!okTipo || !okDestino)) {
+        if (!okTipo && measures[keys[i]].prototype.esPrefijo (tipo)) {
+          okTipo = true;
           tipo = measures[keys[i]].name
         }
-        i++;
-      }
-      // Buscamos el destino
-      ok = false;
-      i = 0;
-      while (i < keys.length && !ok && destino) {
-        if (measures[keys[i]].prototype.esPrefijo (destino)) {
-          ok = true;
+        if (!okDestino && measures[keys[i]].prototype.esPrefijo (destino)) {
+          okDestino = true;
           destino = measures[keys[i]].name
         }
         i++;
       }
 
+      // Ejecutamos la función necesaria
       try {
           if (tipo != destino) {
             var source = new measures[tipo](numero);  // new Fahrenheit(32)
