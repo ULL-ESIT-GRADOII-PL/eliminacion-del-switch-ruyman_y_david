@@ -20,7 +20,7 @@
   }
 
   Metros.prototype = new Longitud();
-  Metros.prototype.MATCH = /(?:m(?:e(?:t(?:r(?:o(?:s)?)?)?)?)?)/i;
+  Metros.prototype.MATCH = /^(?:m(?:e(?:t(?:r(?:o(?:s)?)?)?)?)?)$/i;
   Metros.prototype.constructor = Metros;
   Medida.measures["Metros"] = Metros;
 
@@ -34,7 +34,7 @@
   }
 
   Pulgadas.prototype = new Longitud();
-  Pulgadas.prototype.MATCH = /(?:p(?:u(?:l(?:g(?:a(?:d(?:a(?:s)?)?)?)?)?)?)?)/i;
+  Pulgadas.prototype.MATCH = /^(?:p(?:u(?:l(?:g(?:a(?:d(?:a(?:s)?)?)?)?)?)?)?)$/i;
   Pulgadas.prototype.constructor = Pulgadas;
   Medida.measures["Pulgadas"] = Pulgadas;
 
