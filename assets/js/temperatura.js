@@ -25,7 +25,7 @@
   }
 
   Celsius.prototype = new Temperatura();
-  Celsius.prototype.MATCH = /(?:c(?:e(?:l(?:s(?:i(?:u(?:s)?)?)?)?)?)?)/i;
+  Celsius.prototype.MATCH = /^(?:c(?:e(?:l(?:s(?:i(?:u(?:s)?)?)?)?)?)?)$/i;
   Celsius.prototype.constructor = Celsius;
   Medida.measures["Celsius"] = Celsius;
 
@@ -44,7 +44,7 @@
   }
 
   Fahrenheit.prototype = new Temperatura();
-  Fahrenheit.prototype.MATCH = /(?:f(?:a(?:h(?:r(?:e(?:n(?:h(?:e(?:i(?:t)?)?)?)?)?)?)?)?)?)/i;
+  Fahrenheit.prototype.MATCH = /^(?:f(?:a(?:h(?:r(?:e(?:n(?:h(?:e(?:i(?:t)?)?)?)?)?)?)?)?)?)$/i;
   Fahrenheit.prototype.constructor = Fahrenheit;
   Medida.measures["Fahrenheit"] = Fahrenheit;
 
@@ -62,7 +62,7 @@
   }
 
   Kelvin.prototype = new Temperatura();
-  Kelvin.prototype.MATCH = /(?:k(?:e(?:l(?:v(?:i(?:n)?)?)?)?)?)/i;
+  Kelvin.prototype.MATCH = /^(?:k(?:e(?:l(?:v(?:i(?:n)?)?)?)?)?)$/i;
   Kelvin.prototype.constructor = Kelvin;
   Medida.measures["Kelvin"] = Kelvin;
 
